@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>يلا إنجلش | تواصل معنا</title>
+    <meta name="description" content="تواصل مع فريق يلا إنجلش للإجابة على استفساراتك ومساعدتك في رحلة تعلم الإنجليزية.">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23ED5A2C'/><text x='50' y='72' font-family='Arial, sans-serif' font-size='70' font-weight='bold' fill='%23FCF1E4' text-anchor='middle'>Y</text></svg>">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body style="background: #fff;">
+
+    <!-- Header Navigation -->
+    <header style="background: transparent; backdrop-filter: none; border-bottom: none;">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <img src="YallaEnglishLogoWhite.png" alt="يلا إنجلش" class="desktop-logo" style="height: 40px; width: auto;">
+                <img src="YallaLogo.png" alt="يلا إنجلش" class="mobile-logo" style="height: 40px; width: auto; display: none;">
+            </a>
+            
+            <nav class="nav-links">
+                <a href="index.html">الرئيسية</a>
+                <a href="book.html">احجز مقعدك</a>
+                <a href="login.html">تسجيل الدخول</a>
+                <a href="contact.html" class="active">تواصل معنا</a>
+            </nav>
+            
+            <button class="mobile-menu-btn">☰</button>
+        </div>
+    </header>
+
+    <!-- Split Layout Container -->
+    <div class="split-layout">
+        <!-- Visual Side -->
+        <div class="split-visual" style="background-color: var(--coral);">
+            <!-- Override gradient for this page -->
+            <style>
+                .split-visual.contact-visual::before {
+                    background: radial-gradient(circle, rgba(252,241,228,0.2) 0%, rgba(237,90,44,0) 60%);
+                }
+            </style>
+            <div class="split-visual contact-visual" style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 4rem;">
+                <svg width="80" height="80" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-bottom: 2rem;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                <h2>كيف يمكننا مساعدتك؟</h2>
+                <p>نحن هنا للإجابة على جميع أسئلتك وضمان حصولك على أفضل تجربة ممكنة.</p>
+            </div>
+        </div>
+        
+        <!-- Form Side -->
+        <div class="split-content">
+            <div class="split-widget">
+                <h3 style="font-size: 2rem; margin-bottom: 2rem; color: var(--midnight); text-align: center;">أرسل لنا رسالة</h3>
+                <!-- TutorBird Contact Widget -->
+                <script src="https://app.tutorbird.com/Widget/v4/Widget.ashx?settings=eyJTY2hvb2xJRCI6InNjaF9CWUxKeCIsIldlYnNpdGVJRCI6Indic19kVE5KNiIsIldlYnNpdGVCbG9ja0lEIjoid2JiX0dETTdKVyJ9"></script>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

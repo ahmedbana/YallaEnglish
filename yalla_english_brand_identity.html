@@ -1,0 +1,127 @@
+<style>
+.bs { font-family: var(--font-sans); padding: 1rem 0; }
+.bs-section { margin-bottom: 1.75rem; }
+.bs-label { font-size: 12px; color: var(--color-text-tertiary); margin-bottom: 0.65rem; font-weight: 500; letter-spacing: 0.04em; }
+.bs-hero { background: #FCF1E4; border-radius: 16px; padding: 3rem 2rem; display: flex; align-items: center; justify-content: center; min-height: 240px; }
+.bs-hero-dark { background: #0F1B3A; border-radius: 16px; padding: 2.5rem 2rem; display: flex; align-items: center; justify-content: center; min-height: 200px; }
+.bs-mark-card { background: #FCF1E4; border-radius: 16px; padding: 2.5rem 2rem; display: flex; align-items: center; justify-content: center; min-height: 200px; }
+.bs-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.bs-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.bs-swatch { padding: 4.5rem 1rem 0.85rem; border-radius: 12px; min-height: 130px; display: flex; flex-direction: column; justify-content: flex-end; }
+.bs-swatch-name { font-size: 13px; font-weight: 500; }
+.bs-swatch-hex { font-size: 11px; opacity: 0.7; font-family: var(--font-mono); margin-top: 2px; }
+.bs-app-ad { background: #ED5A2C; border-radius: 16px; padding: 2.25rem 2rem; color: #FCF1E4; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+.bs-app-ad-text { flex: 1; }
+.bs-app-ad-headline { font-size: 22px; font-weight: 600; line-height: 1.25; margin: 0 0 0.4rem; color: #FCF1E4; }
+.bs-app-ad-sub { font-size: 13px; opacity: 0.85; margin: 0; color: #FCF1E4; }
+.bs-app-ad-cta { background: #FCF1E4; color: #0F1B3A; padding: 0.6rem 1.1rem; border-radius: 999px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.bs-type { background: var(--color-background-secondary); border-radius: 12px; padding: 1.5rem; }
+.bs-type-row { padding: 0.5rem 0; }
+.bs-type-row + .bs-type-row { border-top: 0.5px solid var(--color-border-tertiary); margin-top: 0.5rem; padding-top: 1rem; }
+.bs-type-label { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 0.25rem; }
+.bs-type-display { font-size: 26px; font-weight: 600; color: var(--color-text-primary); margin: 0; }
+.bs-type-display-ar { font-size: 24px; font-weight: 600; color: var(--color-text-primary); margin: 0; direction: rtl; text-align: right; }
+.bs-type-body { font-size: 15px; font-weight: 400; color: var(--color-text-secondary); margin: 0; line-height: 1.5; }
+</style>
+
+<div class="bs">
+
+<div class="bs-section">
+<div class="bs-label">Primary lockup</div>
+<div class="bs-hero">
+<svg width="420" height="160" viewBox="0 0 420 160" role="img">
+<title>Yalla English primary logo</title>
+<desc>Bold lowercase wordmark with coral spark mark at the end, with Arabic version below</desc>
+<text x="20" y="60" font-family="var(--font-sans)" font-size="48" font-weight="700" fill="#0F1B3A" style="letter-spacing: -2px;">yalla english</text>
+<g transform="translate(363, 47)">
+<path d="M 0 -13 L 3.5 -3.5 L 13 0 L 3.5 3.5 L 0 13 L -3.5 3.5 L -13 0 L -3.5 -3.5 Z" fill="#ED5A2C"/>
+</g>
+<line x1="20" y1="86" x2="378" y2="86" stroke="#0F1B3A" stroke-width="0.5" opacity="0.15"/>
+<text x="378" y="120" font-family="var(--font-sans)" font-size="32" font-weight="600" fill="#0F1B3A" text-anchor="end" direction="rtl">يلا إنجلش</text>
+</svg>
+</div>
+</div>
+
+<div class="bs-section">
+<div class="bs-grid-2">
+<div>
+<div class="bs-label">On dark</div>
+<div class="bs-hero-dark">
+<svg width="280" height="100" viewBox="0 0 280 100" role="img">
+<title>Logo on dark</title>
+<desc>White version of the wordmark on midnight background</desc>
+<text x="0" y="50" font-family="var(--font-sans)" font-size="36" font-weight="700" fill="#FCF1E4" style="letter-spacing: -1.5px;">yalla english</text>
+<g transform="translate(258, 39)">
+<path d="M 0 -10 L 2.7 -2.7 L 10 0 L 2.7 2.7 L 0 10 L -2.7 2.7 L -10 0 L -2.7 -2.7 Z" fill="#ED5A2C"/>
+</g>
+<text x="258" y="82" font-family="var(--font-sans)" font-size="22" font-weight="600" fill="#FCF1E4" text-anchor="end" direction="rtl">يلا إنجلش</text>
+</svg>
+</div>
+</div>
+<div>
+<div class="bs-label">The mark</div>
+<div class="bs-mark-card">
+<svg width="100" height="100" viewBox="0 0 100 100" role="img">
+<title>Yalla mark</title>
+<desc>Coral 4-point spark</desc>
+<g transform="translate(50, 50)">
+<path d="M 0 -38 L 10.5 -10.5 L 38 0 L 10.5 10.5 L 0 38 L -10.5 10.5 L -38 0 L -10.5 -10.5 Z" fill="#ED5A2C"/>
+</g>
+</svg>
+</div>
+</div>
+</div>
+</div>
+
+<div class="bs-section">
+<div class="bs-label">Color palette</div>
+<div class="bs-grid-4">
+<div class="bs-swatch" style="background: #ED5A2C; color: #FCF1E4;">
+<div class="bs-swatch-name">Yalla coral</div>
+<div class="bs-swatch-hex">#ED5A2C</div>
+</div>
+<div class="bs-swatch" style="background: #0F1B3A; color: #FCF1E4;">
+<div class="bs-swatch-name">Midnight</div>
+<div class="bs-swatch-hex">#0F1B3A</div>
+</div>
+<div class="bs-swatch" style="background: #FCF1E4; color: #0F1B3A; border: 0.5px solid var(--color-border-tertiary);">
+<div class="bs-swatch-name">Cream</div>
+<div class="bs-swatch-hex">#FCF1E4</div>
+</div>
+<div class="bs-swatch" style="background: #6B665E; color: #FCF1E4;">
+<div class="bs-swatch-name">Stone</div>
+<div class="bs-swatch-hex">#6B665E</div>
+</div>
+</div>
+</div>
+
+<div class="bs-section">
+<div class="bs-label">Typography</div>
+<div class="bs-type">
+<div class="bs-type-row">
+<div class="bs-type-label">Display, English</div>
+<p class="bs-type-display">Speak fluently, naturally.</p>
+</div>
+<div class="bs-type-row">
+<div class="bs-type-label">Display, Arabic</div>
+<p class="bs-type-display-ar">تكلّم بطلاقة، بطبيعتك</p>
+</div>
+<div class="bs-type-row">
+<div class="bs-type-label">Body</div>
+<p class="bs-type-body">Your teacher speaks Arabic. Five sessions a week. One fluent you. No trial classes — just a 7-day money-back guarantee.</p>
+</div>
+</div>
+</div>
+
+<div class="bs-section">
+<div class="bs-label">In application</div>
+<div class="bs-app-ad">
+<div class="bs-app-ad-text">
+<p class="bs-app-ad-headline">English with a teacher who actually speaks Arabic.</p>
+<p class="bs-app-ad-sub">499 SAR / month — 5 sessions a week, one teacher, no trials.</p>
+</div>
+<div class="bs-app-ad-cta">ابدأ الآن →</div>
+</div>
+</div>
+
+</div>
