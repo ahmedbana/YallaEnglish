@@ -1,13 +1,30 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Header scroll effect
+    // Header scroll effect + Announcement bar hide on scroll down
     const header = document.querySelector('header');
+    const announcementBar = document.querySelector('.announcement-bar');
+    let lastScrollY = 0;
     
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
+        const currentScrollY = window.scrollY;
+        
+        if (currentScrollY > 50) {
             header.classList.add('scrolled');
         } else {
             header.classList.remove('scrolled');
         }
+
+        // Hide announcement bar on scroll down, show on scroll up
+        if (announcementBar) {
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                announcementBar.classList.add('announcement-bar-hidden');
+                header.style.top = '0';
+            } else {
+                announcementBar.classList.remove('announcement-bar-hidden');
+                header.style.top = '';
+            }
+        }
+        
+        lastScrollY = currentScrollY;
     });
 
     // Mobile Menu Toggle
@@ -47,4 +64,15 @@ document.addEventListener('DOMContentLoaded', () => {
             item.classList.add('active');
         }
     });
+
+    // Announcement bar text rotation
+    const announcementTexts = document.querySelectorAll('.announcement-text');
+    if (announcementTexts.length > 1) {
+        let currentIndex = 0;
+        setInterval(() => {
+            announcementTexts[currentIndex].classList.remove('announcement-text-active');
+            currentIndex = (currentIndex + 1) % announcementTexts.length;
+            announcementTexts[currentIndex].classList.add('announcement-text-active');
+        }, 3000);
+    }
 });
