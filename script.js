@@ -75,4 +75,25 @@ document.addEventListener('DOMContentLoaded', () => {
             announcementTexts[currentIndex].classList.add('announcement-text-active');
         }, 3000);
     }
+
+    // Testimonials slider navigation
+    const track = document.getElementById('testimonials-track');
+    const prevBtn = document.getElementById('testimonial-prev');
+    const nextBtn = document.getElementById('testimonial-next');
+
+    if (track && prevBtn && nextBtn) {
+        const scrollAmount = () => {
+            const card = track.querySelector('.testimonial-card');
+            return card ? card.offsetWidth + 24 : 350;
+        };
+
+        // RTL: prev (right arrow) scrolls left (forward), next (left arrow) scrolls right (backward)
+        prevBtn.addEventListener('click', () => {
+            track.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+        });
+
+        nextBtn.addEventListener('click', () => {
+            track.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+        });
+    }
 });
