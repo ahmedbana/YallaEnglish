@@ -3,6 +3,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const header = document.querySelector('header');
     const announcementBar = document.querySelector('.announcement-bar');
     let lastScrollY = 0;
+
+    // Set header top based on actual announcement bar height
+    const updateHeaderTop = () => {
+        if (announcementBar && header && !announcementBar.classList.contains('announcement-bar-hidden')) {
+            const barHeight = announcementBar.offsetHeight;
+            header.style.top = barHeight + 'px';
+        }
+    };
+    updateHeaderTop();
+    window.addEventListener('resize', updateHeaderTop);
     
     window.addEventListener('scroll', () => {
         const currentScrollY = window.scrollY;
@@ -20,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 header.style.top = '0';
             } else {
                 announcementBar.classList.remove('announcement-bar-hidden');
-                header.style.top = '';
+                updateHeaderTop();
             }
         }
         
@@ -94,6 +104,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
         nextBtn.addEventListener('click', () => {
             track.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+        });
+    }
+
+    // Lightbox for review images
+    const overlay = document.getElementById('lightbox-overlay');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.getElementById('lightbox-close');
+
+    if (overlay && lightboxImg) {
+        document.querySelectorAll('.testimonial-card-img img').forEach(img => {
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.src;
+                lightboxImg.alt = img.alt;
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        const closeLightbox = () => {
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        lightboxClose.addEventListener('click', closeLightbox);
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) closeLightbox();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeLightbox();
+        });
+    }
+
+    // Table scroll arrows
+    const tableEl = document.getElementById('table-responsive');
+    const scrollRight = document.getElementById('table-scroll-right');
+    const scrollLeft = document.getElementById('table-scroll-left');
+
+    if (tableEl && scrollRight && scrollLeft) {
+        scrollRight.addEventListener('click', () => {
+            tableEl.scrollBy({ left: 200, behavior: 'smooth' });
+        });
+        scrollLeft.addEventListener('click', () => {
+            tableEl.scrollBy({ left: -200, behavior: 'smooth' });
         });
     }
 });
