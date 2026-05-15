@@ -719,82 +719,49 @@
                 <p>انضم إلينا كـ مؤسس وابدأ رحلتك في تعلم الإنجليزية.</p>
             </div>
             <div class="widget-annotated">
+                <!-- Native Signup Form -->
+                <div class="widget-container" style="background: #fff; padding: 2.5rem; border-radius: var(--radius-lg);">
+                    <form class="signup-form" id="signup-form">
+                        <h3 class="signup-form-title">بيانات الطالب</h3>
+                        <div class="signup-form-row">
+                            <div class="form-group">
+                                <label for="firstName">الاسم الأول <span class="required-star">*</span></label>
+                                <input type="text" id="firstName" name="firstName" placeholder="أدخل اسمك الأول" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">اسم العائلة <span class="required-star">*</span></label>
+                                <input type="text" id="lastName" name="lastName" placeholder="أدخل اسم العائلة" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">البريد الإلكتروني <span class="required-star">*</span></label>
+                            <input type="email" id="email" name="email" placeholder="example@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">رقم الجوال <span class="required-star">*</span></label>
+                            <input type="tel" id="phone" name="phone" placeholder="05XXXXXXXX" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
+                            سجّل الآن ←
+                        </button>
+                        <p id="form-message" style="text-align: center; font-weight: 600; display: none;"></p>
+                    </form>
+                </div>
+
+                <!-- COMMENTED OUT: TutorBird Widget + Annotations (keep for future use) -->
+                <!--
                 <div class="widget-container" style="background: #fff;">
                     <script
                         src="https://app.tutorbird.com/Widget/v4/Widget.ashx?settings=eyJTY2hvb2xJRCI6InNjaF9CWUxKeCIsIldlYnNpdGVJRCI6Indic19kVE5KNiIsIldlYnNpdGVCbG9ja0lEIjoid2JiX0dEcjVKQyJ9"></script>
                 </div>
 
-                <!-- Step 1: Registration annotations -->
                 <div class="annotations-group annotations-step-1" id="annotations-step-1">
-                    <div class="field-annotation annotation-left" style="top: 120px;">
-                        <svg class="annotation-arrow" viewBox="0 0 70 60" width="70" height="60">
-                            <path d="M65,10 C55,-5 40,25 50,30 C60,35 45,5 35,15 C25,25 30,45 15,40" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M20,33 L13,41 L22,43" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span class="annotation-label">الاسم الأول</span>
-                    </div>
-                    <div class="field-annotation annotation-right" style="top: 200px;">
-                        <span class="annotation-label">اسم العائلة</span>
-                        <svg class="annotation-arrow" viewBox="0 0 70 60" width="70" height="60" style="transform: scaleX(-1);">
-                            <path d="M65,30 C50,10 60,50 45,35 C35,25 50,10 30,20 C20,25 20,45 12,38" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M17,31 L10,39 L19,41" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="field-annotation annotation-right" style="top: 290px;">
-                        <span class="annotation-label">البريد الإلكتروني</span>
-                        <svg class="annotation-arrow" viewBox="0 0 70 60" width="70" height="60" style="transform: scaleX(-1);">
-                            <path d="M65,30 C50,10 60,50 45,35 C35,25 50,10 30,20 C20,25 20,45 12,38" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M17,31 L10,39 L19,41" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="field-annotation annotation-left" style="top: 370px;">
-                        <svg class="annotation-arrow" viewBox="0 0 70 60" width="70" height="60">
-                            <path d="M65,10 C55,-5 40,25 50,30 C60,35 45,5 35,15 C25,25 30,45 15,40" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M20,33 L13,41 L22,43" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span class="annotation-label">رقم الجوال</span>
-                    </div>
-                    <div class="field-annotation annotation-right" style="top: 450px; right: 150px;">
-                        <span class="annotation-label">متابعة</span>
-                        <svg class="annotation-arrow" viewBox="0 0 70 60" width="70" height="60" style="transform: scaleX(-1);">
-                            <path d="M65,10 C55,-5 40,25 50,30 C60,35 45,5 35,15 C25,25 30,45 15,40" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M20,33 L13,41 L22,43" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
+                    ... Step 1 annotations ...
                 </div>
-
-                <!-- Step 2: Payment annotations -->
                 <div class="annotations-group annotations-step-2" id="annotations-step-2" style="display: none;">
-                    <div class="field-annotation annotation-left" style="top: 60px;">
-                        <svg class="annotation-arrow" viewBox="0 0 70 60" width="70" height="60">
-                            <path d="M65,10 C55,-5 40,25 50,30 C60,35 45,5 35,15 C25,25 30,45 15,40" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M20,33 L13,41 L22,43" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span class="annotation-label">رقم البطاقة</span>
-                    </div>
-                    <div class="field-annotation annotation-right" style="top: 140px; right: -10px;">
-                        <span class="annotation-label">تاريخ الانتهاء / رمز الأمان</span>
-                        <svg class="annotation-arrow" viewBox="0 0 70 60" width="70" height="60" style="transform: scaleX(-1);">
-                            <path d="M65,30 C50,10 60,50 45,35 C35,25 50,10 30,20 C20,25 20,45 12,38" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M17,31 L10,39 L19,41" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="field-annotation annotation-left" style="top: 230px;">
-                        <svg class="annotation-arrow" viewBox="0 0 70 60" width="70" height="60">
-                            <path d="M65,10 C55,-5 40,25 50,30 C60,35 45,5 35,15 C25,25 30,45 15,40" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M20,33 L13,41 L22,43" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        <span class="annotation-label">الدولة</span>
-                    </div>
-                    <div class="field-annotation annotation-right" style="top: 400px; right: 100px;">
-                        <span class="annotation-label">متابعة</span>
-                        <svg class="annotation-arrow" viewBox="0 0 70 60" width="70" height="60" style="transform: scaleX(-1);">
-                            <path d="M65,10 C55,-5 40,25 50,30 C60,35 45,5 35,15 C25,25 30,45 15,40" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round"/>
-                            <path d="M20,33 L13,41 L22,43" stroke="var(--coral)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
+                    ... Step 2 annotations ...
                 </div>
-
+                -->
             </div>
         </div>
     </section>

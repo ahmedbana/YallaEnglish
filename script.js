@@ -175,108 +175,84 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ─── Auto-detect Widget Step Changes ───
+    // ─── Native Signup Form → Register + Tap Payment ───
+    const API_BASE = 'http://localhost:3002'; // TODO: Change to production URL
+    const signupForm = document.getElementById('signup-form');
+    const formMessage = document.getElementById('form-message');
+
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = signupForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'جاري التسجيل...';
+            submitBtn.disabled = true;
+            formMessage.style.display = 'none';
+
+            const formData = {
+                firstName: signupForm.firstName.value.trim(),
+                lastName: signupForm.lastName.value.trim(),
+                email: signupForm.email.value.trim(),
+                phone: signupForm.phone.value.trim(),
+            };
+
+            try {
+                // Step 1: Register student (forwards to Zapier)
+                const regResponse = await fetch(`${API_BASE}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+
+                if (!regResponse.ok) {
+                    const err = await regResponse.json();
+                    throw new Error(err.error || 'Registration failed');
+                }
+
+                // Step 2: Create Tap payment charge
+                submitBtn.textContent = 'جاري تجهيز الدفع...';
+
+                const chargeResponse = await fetch(`${API_BASE}/api/create-charge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+
+                const chargeData = await chargeResponse.json();
+
+                if (!chargeResponse.ok || !chargeData.paymentUrl) {
+                    throw new Error(chargeData.error || 'Payment setup failed');
+                }
+
+                // Redirect to Tap payment page
+                formMessage.textContent = '✅ تم التسجيل! جاري تحويلك للدفع...';
+                formMessage.style.color = '#10b981';
+                formMessage.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = chargeData.paymentUrl;
+                }, 1000);
+
+            } catch (err) {
+                console.error('Form error:', err);
+                formMessage.textContent = `❌ ${err.message || 'حدث خطأ، يرجى المحاولة مرة أخرى.'}`;
+                formMessage.style.color = 'var(--coral)';
+                formMessage.style.display = 'block';
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    /* ─── COMMENTED OUT: TutorBird iframe step detection (keep for future use) ───
     const step1El = document.getElementById('annotations-step-1');
     const step2El = document.getElementById('annotations-step-2');
     let currentStep = 1;
     let stepChanges = 0;
-
-    function showStep(step) {
-        if (!step1El || !step2El) return;
-        if (step === currentStep) return;
-        if (step === 1) {
-            step1El.style.display = '';
-            step2El.style.display = 'none';
-            currentStep = 1;
-        } else if (step === 2) {
-            step1El.style.display = 'none';
-            step2El.style.display = '';
-            currentStep = 2;
-        }
-    }
-
+    function showStep(step) { ... }
     let cooldown = false;
-
-    function onStepChange() {
-        if (cooldown) return;
-        stepChanges++;
-        showStep(stepChanges % 2 === 1 ? 2 : 1);
-        // Lock out further changes for 3 seconds to prevent bounce-back
-        cooldown = true;
-        setTimeout(() => {
-            cooldown = false;
-            takeSnapshot(); // re-snapshot after settling
-        }, 3000);
-    }
-
-    const widgetContainer = document.querySelector('.widget-container');
-    if (widgetContainer && step1El && step2El) {
-        let iframe = null;
-        let snapshotHeight = 0;
-        let snapshotStyle = '';
-
-        function takeSnapshot() {
-            if (!iframe) return;
-            snapshotHeight = iframe.offsetHeight;
-            snapshotStyle = iframe.getAttribute('style') || '';
-        }
-
-        function hasChanged() {
-            if (!iframe || cooldown) return false;
-            const h = iframe.offsetHeight;
-            const s = iframe.getAttribute('style') || '';
-            return Math.abs(h - snapshotHeight) > 20 || s !== snapshotStyle;
-        }
-
-        // Signal 1: Detect clicks inside iframe via window blur
-        let blurPoll = null;
-        window.addEventListener('blur', () => {
-            if (!iframe || cooldown) return;
-            if (document.activeElement === iframe) {
-                let checks = 0;
-                clearInterval(blurPoll);
-                blurPoll = setInterval(() => {
-                    checks++;
-                    if (hasChanged()) {
-                        clearInterval(blurPoll);
-                        takeSnapshot();
-                        onStepChange();
-                    }
-                    if (checks >= 10) clearInterval(blurPoll);
-                }, 500);
-            }
-        });
-
-        const setupObservers = () => {
-            iframe = widgetContainer.querySelector('iframe');
-            if (!iframe) { setTimeout(setupObservers, 500); return; }
-            takeSnapshot();
-
-            // Signal 2: MutationObserver on iframe attributes
-            new MutationObserver((muts) => {
-                if (cooldown) return;
-                for (const m of muts) {
-                    if (m.type === 'attributes' && hasChanged()) {
-                        takeSnapshot();
-                        onStepChange();
-                        break;
-                    }
-                }
-            }).observe(iframe, { attributes: true });
-
-            // Signal 3: ResizeObserver as backup
-            if (typeof ResizeObserver !== 'undefined') {
-                new ResizeObserver(() => {
-                    if (hasChanged()) { takeSnapshot(); onStepChange(); }
-                }).observe(iframe);
-            }
-        };
-
-        // Watch for iframe injection
-        new MutationObserver(() => {
-            if (!iframe && widgetContainer.querySelector('iframe')) setupObservers();
-        }).observe(widgetContainer, { childList: true, subtree: true });
-
-        setTimeout(setupObservers, 1500);
-    }
+    function onStepChange() { ... }
+    // Signal-based iframe detection with blur, MutationObserver, ResizeObserver
+    ─── END COMMENTED OUT ─── */
 });
