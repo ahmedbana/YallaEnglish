@@ -175,27 +175,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ─── Two-Step: Register → Embedded Tap Payment ───
+    // ─── Two-Step: Register → Tap Payment Lightbox ───
     const API_BASE = ''; // Same domain
     const signupForm = document.getElementById('signup-form');
     const formMessage = document.getElementById('form-message');
     const step1Container = document.getElementById('step-1-container');
     const step2Container = document.getElementById('step-2-container');
-    const paymentMessage = document.getElementById('payment-message');
-    const backBtn = document.getElementById('back-to-step1');
 
     let savedFormData = null;
 
-    // Back button: return to Step 1
-    if (backBtn) {
-        backBtn.addEventListener('click', () => {
-            step2Container.style.display = 'none';
-            step1Container.style.display = '';
-        });
-    }
-
-    // Initialize goSell.js payment form
-    async function initPaymentForm() {
+    // Open Tap payment lightbox (styled modal on same page)
+    async function openPaymentLightbox() {
         try {
             const configRes = await fetch(`${API_BASE}/api/tap/config`);
             const config = await configRes.json();
@@ -205,14 +195,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            goSell.goSellElements({
-                containerID: 'tap-payment-container',
+            goSell.openLightBox({
                 gateway: {
                     publicKey: config.publicKey,
                     language: 'ar',
-                    supportedCurrencies: ['SAR'],
+                    contactInfo: true,
+                    supportedCurrencies: 'all',
                     supportedPaymentMethods: 'all',
+                    saveCardOption: false,
+                    customerCards: false,
                     notifications: 'standard',
+                    backgroundImg: {
+                        url: 'https://yallaenglish.onrender.com/LogoNewPNG.png',
+                        opacity: '0.1',
+                    },
+                    labels: {
+                        cardNumber: 'رقم البطاقة',
+                        expirationDate: 'تاريخ الانتهاء',
+                        cvv: 'رمز الأمان',
+                        cardHolder: 'اسم حامل البطاقة',
+                    },
                     style: {
                         base: {
                             color: '#0F1B3A',
@@ -227,16 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                     },
                 },
-                order: {
-                    amount: 199,
-                    currency: 'SAR',
-                    items: [{
-                        id: 1,
-                        name: 'اشتراك عرض المؤسسين',
-                        quantity: 1,
-                        amount_per_unit: 199,
-                    }],
-                },
                 customer: {
                     first_name: savedFormData?.firstName || '',
                     last_name: savedFormData?.lastName || '',
@@ -246,49 +238,60 @@ document.addEventListener('DOMContentLoaded', () => {
                         number: (savedFormData?.phone || '').replace(/^0+/, ''),
                     },
                 },
-                callback: async (response) => {
-                    // Token created by goSell.js → send to our server
-                    if (response && response.id) {
-                        paymentMessage.textContent = 'جاري معالجة الدفع...';
-                        paymentMessage.style.color = '#0F1B3A';
-                        paymentMessage.style.display = 'block';
-
-                        try {
-                            const chargeRes = await fetch(`${API_BASE}/api/charge-token`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    token: response.id,
-                                    ...savedFormData,
-                                }),
-                            });
-                            const chargeData = await chargeRes.json();
-
-                            if (chargeData.redirectUrl) {
-                                // 3DS verification needed
-                                window.location.href = chargeData.redirectUrl;
-                            } else if (chargeData.success) {
-                                window.location.href = '/payment-success.html';
-                            } else {
-                                paymentMessage.textContent = '❌ فشل الدفع، يرجى المحاولة مرة أخرى';
-                                paymentMessage.style.color = 'var(--coral)';
-                            }
-                        } catch (err) {
-                            paymentMessage.textContent = '❌ حدث خطأ في الدفع';
-                            paymentMessage.style.color = 'var(--coral)';
-                        }
-                    }
+                order: {
+                    amount: 199,
+                    currency: 'SAR',
+                    items: [{
+                        id: 1,
+                        name: 'اشتراك يلا إنجلش - عرض المؤسسين',
+                        description: 'اشتراك شهري في برنامج يلا إنجلش',
+                        quantity: 1,
+                        amount_per_unit: 199,
+                    }],
                 },
-                onError: (error) => {
-                    console.error('goSell error:', error);
-                    paymentMessage.textContent = '❌ خطأ في بيانات البطاقة';
-                    paymentMessage.style.color = 'var(--coral)';
-                    paymentMessage.style.display = 'block';
+                transaction: {
+                    mode: 'charge',
+                    charge: {
+                        saveCard: false,
+                        threeDSecure: true,
+                        description: 'Yalla English - اشتراك عرض المؤسسين',
+                        statement_descriptor: 'Yalla English',
+                        metadata: {
+                            source: 'landing-page',
+                            email: savedFormData?.email || '',
+                        },
+                        receipt: { email: true, sms: true },
+                        redirect: `${window.location.origin}/payment-success.html`,
+                        post: `${window.location.origin}/api/tap/webhook`,
+                    },
                 },
             });
         } catch (err) {
-            console.error('Payment init error:', err);
+            console.error('Payment lightbox error:', err);
+            formMessage.textContent = '❌ حدث خطأ في فتح نافذة الدفع';
+            formMessage.style.color = 'var(--coral)';
+            formMessage.style.display = 'block';
         }
+    }
+
+    // goSell callback handlers (global)
+    if (typeof goSell !== 'undefined') {
+        goSell.config({
+            callback: (response) => {
+                console.log('Tap callback:', response);
+                if (response.callback && response.callback.status === 'CAPTURED') {
+                    window.location.href = '/payment-success.html';
+                }
+            },
+            onClose: () => {
+                // Re-enable the form if user closes the lightbox
+                const submitBtn = signupForm?.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.textContent = 'التالي - الدفع ←';
+                    submitBtn.disabled = false;
+                }
+            },
+        });
     }
 
     if (signupForm) {
@@ -321,10 +324,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(err.error || 'Registration failed');
                 }
 
-                // Show Step 2: Payment form
-                step1Container.style.display = 'none';
-                step2Container.style.display = '';
-                initPaymentForm();
+                // Open Tap payment lightbox
+                submitBtn.textContent = 'جاري فتح نافذة الدفع...';
+                openPaymentLightbox();
 
             } catch (err) {
                 console.error('Form error:', err);
