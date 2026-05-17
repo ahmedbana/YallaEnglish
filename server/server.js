@@ -142,11 +142,15 @@ app.post('/api/zapier/create-payment', requireApiKey, async (req, res) => {
 // On success → forwards to Zapier Flow 2 (Add Payment + Activate Student)
 app.post('/api/tap/webhook', async (req, res) => {
     try {
+        console.log('═══ TAP WEBHOOK RECEIVED ═══');
+        console.log('Body:', JSON.stringify(req.body, null, 2));
+
         const { id, status, amount, currency, customer, metadata, reference } = req.body;
 
         console.log(`💳 Payment ${status}: charge_${id} | ${amount} ${currency}`);
         console.log(`   FamilyID: ${metadata?.familyId}`);
         console.log(`   Customer: ${customer?.first_name} ${customer?.last_name} (${customer?.email})`);
+        console.log(`   ZAPIER_PAYMENT_WEBHOOK_URL set: ${!!process.env.ZAPIER_PAYMENT_WEBHOOK_URL}`);
 
         if (status === 'CAPTURED') {
             console.log('✅ Payment successful! Forwarding to Zapier Flow 2...');
