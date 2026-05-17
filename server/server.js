@@ -122,10 +122,13 @@ app.post('/api/zapier/create-payment', requireApiKey, async (req, res) => {
 
         console.log('Tap charge created:', tapData.id, '→', tapData.transaction?.url);
 
+        let paymentUrl = tapData.transaction?.url || '';
+        paymentUrl = paymentUrl.replace('language=en', 'language=ar');
+
         res.json({
             success: true,
             chargeId: tapData.id,
-            paymentUrl: tapData.transaction?.url,
+            paymentUrl: paymentUrl,
             status: tapData.status,
         });
     } catch (err) {
@@ -221,12 +224,11 @@ app.post('/api/create-charge', async (req, res) => {
                 phone: phone ? { country_code: '966', number: phone.replace(/^0+/, '') } : undefined,
             },
             source: { id: 'src_all' },
-            language: 'ar',
             post: {
                 url: `${process.env.FRONTEND_URL || 'http://localhost:3002'}/api/tap/webhook`,
             },
             redirect: {
-                url: `${process.env.FRONTEND_URL || 'http://localhost:5500'}/payment-success.html`,
+                url: `${process.env.FRONTEND_URL || 'http://localhost:3002'}/payment-success.html`,
             },
         };
 
@@ -247,14 +249,41 @@ app.post('/api/create-charge', async (req, res) => {
             return res.status(400).json({ error: 'فشل إنشاء رابط الدفع', details: tapData });
         }
 
+        // Force Arabic on checkout page
+        let paymentUrl = tapData.transaction?.url || '';
+        paymentUrl = paymentUrl.replace('language=en', 'language=ar');
+
         res.json({
             success: true,
             chargeId: tapData.id,
-            paymentUrl: tapData.transaction?.url,
+            paymentUrl: paymentUrl,
         });
     } catch (err) {
         console.error('Charge creation error:', err);
         res.status(500).json({ error: 'حدث خطأ' });
+    }
+});
+
+// ─── Verify Charge Status ───
+// Frontend calls this after Tap redirects back to check if payment succeeded
+app.get('/api/verify-charge/:chargeId', async (req, res) => {
+    try {
+        const tapResponse = await fetch(`https://api.tap.company/v2/charges/${req.params.chargeId}`, {
+            headers: {
+                'Authorization': `Bearer ${process.env.TAP_SECRET_KEY}`,
+            },
+        });
+        const tapData = await tapResponse.json();
+
+        res.json({
+            status: tapData.status,
+            amount: tapData.amount,
+            currency: tapData.currency,
+            chargeId: tapData.id,
+        });
+    } catch (err) {
+        console.error('Verify charge error:', err);
+        res.status(500).json({ error: 'Failed to verify charge' });
     }
 });
 

@@ -180,6 +180,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const signupForm = document.getElementById('signup-form');
     const formMessage = document.getElementById('form-message');
 
+    // Check if user was redirected back with a payment error
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentError = urlParams.get('payment_error');
+    if (paymentError && formMessage) {
+        formMessage.textContent = `❌ ${paymentError}`;
+        formMessage.style.color = 'var(--coral)';
+        formMessage.style.display = 'block';
+        // Clean URL
+        history.replaceState(null, '', window.location.pathname + window.location.hash);
+    }
+
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
