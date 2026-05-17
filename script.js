@@ -175,120 +175,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ─── Two-Step: Register → Tap Payment Lightbox ───
+    // ─── Register → Tap Payment (Arabic checkout redirect) ───
     const API_BASE = ''; // Same domain
     const signupForm = document.getElementById('signup-form');
     const formMessage = document.getElementById('form-message');
-
-    let savedFormData = null;
-
-    // Configure and open Tap payment lightbox
-    async function openPaymentLightbox() {
-        try {
-            const configRes = await fetch(`${API_BASE}/api/tap/config`);
-            const config = await configRes.json();
-
-            if (!config.publicKey) {
-                console.error('No Tap public key');
-                return;
-            }
-
-            // Step 1: Configure goSell with ALL settings
-            goSell.config({
-                gateway: {
-                    publicKey: config.publicKey,
-                    language: 'ar',
-                    contactInfo: true,
-                    supportedCurrencies: 'all',
-                    supportedPaymentMethods: 'all',
-                    saveCardOption: false,
-                    customerCards: false,
-                    notifications: 'standard',
-                    backgroundImg: {
-                        url: 'https://yallaenglish.onrender.com/LogoNewPNG.png',
-                        opacity: '0.1',
-                    },
-                    labels: {
-                        cardNumber: 'رقم البطاقة',
-                        expirationDate: 'تاريخ الانتهاء',
-                        cvv: 'رمز الأمان',
-                        cardHolder: 'اسم حامل البطاقة',
-                    },
-                    style: {
-                        base: {
-                            color: '#0F1B3A',
-                            lineHeight: '24px',
-                            fontFamily: 'Tajawal, sans-serif',
-                            fontSmoothing: 'antialiased',
-                            fontSize: '16px',
-                            '::placeholder': { color: '#aaa' },
-                        },
-                        invalid: {
-                            color: '#ED5A2C',
-                        },
-                    },
-                    callback: (response) => {
-                        console.log('Tap callback:', response);
-                        if (response.callback && response.callback.status === 'CAPTURED') {
-                            window.location.href = '/payment-success.html';
-                        }
-                    },
-                    onClose: () => {
-                        const submitBtn = signupForm?.querySelector('button[type="submit"]');
-                        if (submitBtn) {
-                            submitBtn.textContent = 'التالي - الدفع ←';
-                            submitBtn.disabled = false;
-                        }
-                    },
-                },
-                customer: {
-                    first_name: savedFormData?.firstName || '',
-                    last_name: savedFormData?.lastName || '',
-                    email: savedFormData?.email || '',
-                    phone: {
-                        country_code: '966',
-                        number: (savedFormData?.phone || '').replace(/^0+/, ''),
-                    },
-                },
-                order: {
-                    amount: 199,
-                    currency: 'SAR',
-                    items: [{
-                        id: 1,
-                        name: 'اشتراك يلا إنجلش - عرض المؤسسين',
-                        description: 'اشتراك شهري في برنامج يلا إنجلش',
-                        quantity: 1,
-                        amount_per_unit: 199,
-                    }],
-                },
-                transaction: {
-                    mode: 'charge',
-                    charge: {
-                        saveCard: false,
-                        threeDSecure: true,
-                        description: 'Yalla English - اشتراك عرض المؤسسين',
-                        statement_descriptor: 'Yalla English',
-                        metadata: {
-                            source: 'landing-page',
-                            email: savedFormData?.email || '',
-                        },
-                        receipt: { email: true, sms: true },
-                        redirect: `${window.location.origin}/payment-success.html`,
-                        post: `${window.location.origin}/api/tap/webhook`,
-                    },
-                },
-            });
-
-            // Step 2: Open lightbox (no arguments needed)
-            goSell.openLightBox();
-
-        } catch (err) {
-            console.error('Payment lightbox error:', err);
-            formMessage.textContent = '❌ حدث خطأ في فتح نافذة الدفع';
-            formMessage.style.color = 'var(--coral)';
-            formMessage.style.display = 'block';
-        }
-    }
 
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
@@ -300,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
             formMessage.style.display = 'none';
 
-            savedFormData = {
+            const formData = {
                 firstName: signupForm.firstName.value.trim(),
                 lastName: signupForm.lastName.value.trim(),
                 email: signupForm.email.value.trim(),
@@ -308,11 +198,11 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                // Register student (forwards to Zapier)
+                // Step 1: Register student (forwards to Zapier)
                 const regResponse = await fetch(`${API_BASE}/api/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(savedFormData),
+                    body: JSON.stringify(formData),
                 });
 
                 if (!regResponse.ok) {
@@ -320,9 +210,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(err.error || 'Registration failed');
                 }
 
-                // Open Tap payment lightbox
-                submitBtn.textContent = 'جاري فتح نافذة الدفع...';
-                openPaymentLightbox();
+                // Step 2: Create Tap charge → redirect to Arabic payment page
+                submitBtn.textContent = 'جاري تجهيز الدفع...';
+
+                const chargeResponse = await fetch(`${API_BASE}/api/create-charge`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData),
+                });
+
+                const chargeData = await chargeResponse.json();
+
+                if (!chargeResponse.ok || !chargeData.paymentUrl) {
+                    throw new Error(chargeData.error || 'Payment setup failed');
+                }
+
+                // Redirect to Tap Arabic payment page
+                formMessage.textContent = '✅ تم التسجيل! جاري تحويلك للدفع...';
+                formMessage.style.color = '#10b981';
+                formMessage.style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = chargeData.paymentUrl;
+                }, 1000);
 
             } catch (err) {
                 console.error('Form error:', err);
