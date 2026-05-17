@@ -238,7 +238,8 @@ app.post('/api/create-charge', async (req, res) => {
         const tapData = await tapResponse.json();
 
         if (!tapResponse.ok) {
-            console.error('Tap API error:', tapData);
+            console.error('Tap API error:', JSON.stringify(tapData, null, 2));
+            console.error('Tap status:', tapResponse.status);
             return res.status(400).json({ error: 'فشل إنشاء رابط الدفع', details: tapData });
         }
 
