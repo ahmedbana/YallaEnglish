@@ -134,21 +134,43 @@ app.post('/api/zapier/create-payment', requireApiKey, async (req, res) => {
 
 // ─── Tap Webhook: Payment Result ───
 // Tap POSTs the charge result after payment completes
+// On success → forwards to Zapier Flow 2 (Add Payment + Activate Student)
 app.post('/api/tap/webhook', async (req, res) => {
     try {
-        const { id, status, amount, currency, customer, metadata } = req.body;
+        const { id, status, amount, currency, customer, metadata, reference } = req.body;
 
         console.log(`💳 Payment ${status}: charge_${id} | ${amount} ${currency}`);
         console.log(`   FamilyID: ${metadata?.familyId}`);
         console.log(`   Customer: ${customer?.first_name} ${customer?.last_name} (${customer?.email})`);
 
-        // TODO: Update your database/CRM with payment status
-        // TODO: Notify Zapier or TutorBird about successful payment
-        // TODO: Send confirmation email/WhatsApp
-
         if (status === 'CAPTURED') {
-            console.log('✅ Payment successful!');
-            // Payment was captured successfully
+            console.log('✅ Payment successful! Forwarding to Zapier Flow 2...');
+
+            // Send to Zapier Flow 2: Add Payment + Activate Student
+            if (process.env.ZAPIER_PAYMENT_WEBHOOK_URL) {
+                try {
+                    await fetch(process.env.ZAPIER_PAYMENT_WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chargeId: id,
+                            status: status,
+                            amount: amount,
+                            currency: currency,
+                            email: customer?.email || '',
+                            firstName: customer?.first_name || '',
+                            lastName: customer?.last_name || '',
+                            phone: customer?.phone?.number || '',
+                            familyId: metadata?.familyId || '',
+                            transactionRef: reference?.transaction || '',
+                            paidAt: new Date().toISOString(),
+                        }),
+                    });
+                    console.log('   → Zapier Flow 2 notified');
+                } catch (zapErr) {
+                    console.error('   → Zapier Flow 2 notification failed:', zapErr.message);
+                }
+            }
         } else {
             console.log(`⚠️ Payment status: ${status}`);
         }
