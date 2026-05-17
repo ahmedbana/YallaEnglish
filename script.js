@@ -179,12 +179,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_BASE = ''; // Same domain
     const signupForm = document.getElementById('signup-form');
     const formMessage = document.getElementById('form-message');
-    const step1Container = document.getElementById('step-1-container');
-    const step2Container = document.getElementById('step-2-container');
 
     let savedFormData = null;
 
-    // Open Tap payment lightbox (styled modal on same page)
+    // Configure and open Tap payment lightbox
     async function openPaymentLightbox() {
         try {
             const configRes = await fetch(`${API_BASE}/api/tap/config`);
@@ -195,7 +193,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            goSell.openLightBox({
+            // Step 1: Configure goSell with ALL settings
+            goSell.config({
                 gateway: {
                     publicKey: config.publicKey,
                     language: 'ar',
@@ -227,6 +226,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         invalid: {
                             color: '#ED5A2C',
                         },
+                    },
+                    callback: (response) => {
+                        console.log('Tap callback:', response);
+                        if (response.callback && response.callback.status === 'CAPTURED') {
+                            window.location.href = '/payment-success.html';
+                        }
+                    },
+                    onClose: () => {
+                        const submitBtn = signupForm?.querySelector('button[type="submit"]');
+                        if (submitBtn) {
+                            submitBtn.textContent = 'التالي - الدفع ←';
+                            submitBtn.disabled = false;
+                        }
                     },
                 },
                 customer: {
@@ -266,32 +278,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     },
                 },
             });
+
+            // Step 2: Open lightbox (no arguments needed)
+            goSell.openLightBox();
+
         } catch (err) {
             console.error('Payment lightbox error:', err);
             formMessage.textContent = '❌ حدث خطأ في فتح نافذة الدفع';
             formMessage.style.color = 'var(--coral)';
             formMessage.style.display = 'block';
         }
-    }
-
-    // goSell callback handlers (global)
-    if (typeof goSell !== 'undefined') {
-        goSell.config({
-            callback: (response) => {
-                console.log('Tap callback:', response);
-                if (response.callback && response.callback.status === 'CAPTURED') {
-                    window.location.href = '/payment-success.html';
-                }
-            },
-            onClose: () => {
-                // Re-enable the form if user closes the lightbox
-                const submitBtn = signupForm?.querySelector('button[type="submit"]');
-                if (submitBtn) {
-                    submitBtn.textContent = 'التالي - الدفع ←';
-                    submitBtn.disabled = false;
-                }
-            },
-        });
     }
 
     if (signupForm) {
