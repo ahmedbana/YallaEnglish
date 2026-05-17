@@ -175,10 +175,121 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ─── Native Signup Form → Register + Tap Payment ───
-    const API_BASE = ''; // Same domain — API served from same server
+    // ─── Two-Step: Register → Embedded Tap Payment ───
+    const API_BASE = ''; // Same domain
     const signupForm = document.getElementById('signup-form');
     const formMessage = document.getElementById('form-message');
+    const step1Container = document.getElementById('step-1-container');
+    const step2Container = document.getElementById('step-2-container');
+    const paymentMessage = document.getElementById('payment-message');
+    const backBtn = document.getElementById('back-to-step1');
+
+    let savedFormData = null;
+
+    // Back button: return to Step 1
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            step2Container.style.display = 'none';
+            step1Container.style.display = '';
+        });
+    }
+
+    // Initialize goSell.js payment form
+    async function initPaymentForm() {
+        try {
+            const configRes = await fetch(`${API_BASE}/api/tap/config`);
+            const config = await configRes.json();
+
+            if (!config.publicKey) {
+                console.error('No Tap public key');
+                return;
+            }
+
+            goSell.goSellElements({
+                containerID: 'tap-payment-container',
+                gateway: {
+                    publicKey: config.publicKey,
+                    language: 'ar',
+                    supportedCurrencies: ['SAR'],
+                    supportedPaymentMethods: 'all',
+                    notifications: 'standard',
+                    style: {
+                        base: {
+                            color: '#0F1B3A',
+                            lineHeight: '24px',
+                            fontFamily: 'Tajawal, sans-serif',
+                            fontSmoothing: 'antialiased',
+                            fontSize: '16px',
+                            '::placeholder': { color: '#aaa' },
+                        },
+                        invalid: {
+                            color: '#ED5A2C',
+                        },
+                    },
+                },
+                order: {
+                    amount: 199,
+                    currency: 'SAR',
+                    items: [{
+                        id: 1,
+                        name: 'اشتراك عرض المؤسسين',
+                        quantity: 1,
+                        amount_per_unit: 199,
+                    }],
+                },
+                customer: {
+                    first_name: savedFormData?.firstName || '',
+                    last_name: savedFormData?.lastName || '',
+                    email: savedFormData?.email || '',
+                    phone: {
+                        country_code: '966',
+                        number: (savedFormData?.phone || '').replace(/^0+/, ''),
+                    },
+                },
+                callback: async (response) => {
+                    // Token created by goSell.js → send to our server
+                    if (response && response.id) {
+                        paymentMessage.textContent = 'جاري معالجة الدفع...';
+                        paymentMessage.style.color = '#0F1B3A';
+                        paymentMessage.style.display = 'block';
+
+                        try {
+                            const chargeRes = await fetch(`${API_BASE}/api/charge-token`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    token: response.id,
+                                    ...savedFormData,
+                                }),
+                            });
+                            const chargeData = await chargeRes.json();
+
+                            if (chargeData.redirectUrl) {
+                                // 3DS verification needed
+                                window.location.href = chargeData.redirectUrl;
+                            } else if (chargeData.success) {
+                                window.location.href = '/payment-success.html';
+                            } else {
+                                paymentMessage.textContent = '❌ فشل الدفع، يرجى المحاولة مرة أخرى';
+                                paymentMessage.style.color = 'var(--coral)';
+                            }
+                        } catch (err) {
+                            paymentMessage.textContent = '❌ حدث خطأ في الدفع';
+                            paymentMessage.style.color = 'var(--coral)';
+                        }
+                    }
+                },
+                onError: (error) => {
+                    console.error('goSell error:', error);
+                    paymentMessage.textContent = '❌ خطأ في بيانات البطاقة';
+                    paymentMessage.style.color = 'var(--coral)';
+                    paymentMessage.style.display = 'block';
+                },
+            });
+        } catch (err) {
+            console.error('Payment init error:', err);
+        }
+    }
 
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
@@ -190,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
             formMessage.style.display = 'none';
 
-            const formData = {
+            savedFormData = {
                 firstName: signupForm.firstName.value.trim(),
                 lastName: signupForm.lastName.value.trim(),
                 email: signupForm.email.value.trim(),
@@ -198,11 +309,11 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             try {
-                // Step 1: Register student (forwards to Zapier)
+                // Register student (forwards to Zapier)
                 const regResponse = await fetch(`${API_BASE}/api/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData),
+                    body: JSON.stringify(savedFormData),
                 });
 
                 if (!regResponse.ok) {
@@ -210,29 +321,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     throw new Error(err.error || 'Registration failed');
                 }
 
-                // Step 2: Create Tap payment charge
-                submitBtn.textContent = 'جاري تجهيز الدفع...';
-
-                const chargeResponse = await fetch(`${API_BASE}/api/create-charge`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData),
-                });
-
-                const chargeData = await chargeResponse.json();
-
-                if (!chargeResponse.ok || !chargeData.paymentUrl) {
-                    throw new Error(chargeData.error || 'Payment setup failed');
-                }
-
-                // Redirect to Tap payment page
-                formMessage.textContent = '✅ تم التسجيل! جاري تحويلك للدفع...';
-                formMessage.style.color = '#10b981';
-                formMessage.style.display = 'block';
-
-                setTimeout(() => {
-                    window.location.href = chargeData.paymentUrl;
-                }, 1000);
+                // Show Step 2: Payment form
+                step1Container.style.display = 'none';
+                step2Container.style.display = '';
+                initPaymentForm();
 
             } catch (err) {
                 console.error('Form error:', err);

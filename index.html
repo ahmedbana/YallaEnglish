@@ -719,8 +719,8 @@
                 <p>انضم إلينا كـ مؤسس وابدأ رحلتك في تعلم الإنجليزية.</p>
             </div>
             <div class="widget-annotated">
-                <!-- Native Signup Form -->
-                <div class="widget-container" style="background: #fff; padding: 2.5rem; border-radius: var(--radius-lg);">
+                <!-- Step 1: Native Signup Form -->
+                <div class="widget-container" id="step-1-container" style="background: #fff; padding: 2.5rem; border-radius: var(--radius-lg);">
                     <form class="signup-form" id="signup-form">
                         <h3 class="signup-form-title">بيانات الطالب</h3>
                         <div class="signup-form-row">
@@ -742,10 +742,21 @@
                             <input type="tel" id="phone" name="phone" placeholder="05XXXXXXXX" required>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1.1rem;">
-                            سجّل الآن ←
+                            التالي - الدفع ←
                         </button>
                         <p id="form-message" style="text-align: center; font-weight: 600; display: none;"></p>
                     </form>
+                </div>
+
+                <!-- Step 2: Tap Payment (embedded) -->
+                <div class="widget-container" id="step-2-container" style="background: #fff; padding: 2.5rem; border-radius: var(--radius-lg); display: none;">
+                    <h3 class="signup-form-title" style="margin-bottom: 0.5rem;">إتمام الدفع</h3>
+                    <p style="color: var(--stone); margin-bottom: 1.5rem; font-size: 0.95rem;">اشتراك عرض المؤسسين — <strong style="color: var(--coral);">١٩٩ ر.س / شهرياً</strong></p>
+                    <div id="tap-payment-container" style="min-height: 300px;"></div>
+                    <p id="payment-message" style="text-align: center; font-weight: 600; display: none; margin-top: 1rem;"></p>
+                    <button id="back-to-step1" type="button" style="background: none; border: none; color: var(--stone); cursor: pointer; font-family: var(--font-ar); font-size: 0.9rem; margin-top: 1rem; text-decoration: underline;">
+                        → العودة لتعديل البيانات
+                    </button>
                 </div>
 
                 <!-- COMMENTED OUT: TutorBird Widget + Annotations (keep for future use)
@@ -821,6 +832,7 @@
         <iframe class="lightbox-pdf" id="lightbox-pdf" src="" hidden></iframe>
     </div>
 
+    <script type="text/javascript" src="https://goSellJSLib.b-cdn.net/v2.0.4/js/gosell.js"></script>
     <script src="script.js"></script>
 </body>
 
