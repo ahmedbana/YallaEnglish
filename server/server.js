@@ -1,13 +1,17 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 // ─── Middleware ───
-app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
+app.use(cors());
 app.use(express.json());
+
+// ─── Serve static files (HTML, CSS, JS, images) from parent directory ───
+app.use(express.static(path.join(__dirname, '..')));
 
 // ─── API Key Auth Middleware (for Zapier callbacks) ───
 function requireApiKey(req, res, next) {

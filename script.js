@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ─── Native Signup Form → Register + Tap Payment ───
-    const API_BASE = 'http://localhost:3002'; // TODO: Change to production URL
+    const API_BASE = ''; // Same domain — API served from same server
     const signupForm = document.getElementById('signup-form');
     const formMessage = document.getElementById('form-message');
 
